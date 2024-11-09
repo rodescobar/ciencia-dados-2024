@@ -1,0 +1,156 @@
+---
+title: "Um Exemplo de Análise Exploratória dos Dados"
+subtitle: "bservações que foram amostradas aleatoriamente da pesquisa High School and Beyond (2024), uma pesquisa conduzida com alunos do último ano do ensino médio pelo National Center of Education Statistics"
+author: "GRUPO-04"
+affiliation: "FAAC/UNESP-Bauru"
+date: 09/11/2024
+date-format: DD/MM/YYYY
+format: 
+  html: default
+  pdf: default
+  docx: default
+editor: visual
+---
+
+### 2.1. Carregamento dos Dados
+
+Instalação dos pacotes
+
+```{r}
+# Instalar os pacotes
+install.packages("tidyverse")
+install.packages("readr")
+install.packages("summarytools")
+install.packages("ggplot2")
+install.packages("corrplot")
+```
+
+Carregamento dos pacotes
+
+```{r}
+library(tidyverse)
+library(readr)
+library(summarytools)
+library(ggplot2)
+library(corrplot)
+```
+
+## 3. Análise Exploratória de Dados com hsb2f
+
+Neste item, realizaremos uma Análise Exploratória de Dados (AED) utilizando o dataset `hsb2f` localizado na pasta `grupo-04/dados/`.
+
+### 3.1 Carregamento dos Dados
+
+Primeiro, vamos carregar o arquivo CSV no R em uma váriavel chamada **hsb2f** e verificar as primeiras linhas do dataset e a estrutura dos dados.
+
+```{r}
+# Carregar o dataset
+hsb2f <- read.csv("../dados/hsb2f.csv", sep=";")
+```
+
+Após o carregamento do conteúdo de nossos dados exploratórios na variável **hsb2f**, podemos utilizar o comando *head* para identificar as primeiras linhas do nosso dataset.
+
+Por padrão o comando *head* traz as 6 primeiras linhas do arquivo, esse modelo é utilizado pois essa quantidade de dados é de simples leitura e validação do contúedo.
+
+```{r}
+# Verificar as primeiras linhas do dataset
+head(hsb2f)
+```
+
+É possível também mudar a quantidade de registros conforme docuemntação da linguagem R, que pode ser analisada através do código
+
+```{r}
+?head
+```
+
+Abaixo um exemplo da utilização do carregamento do conteúdo de nossos dados exploratórios com mais linhas do que as representadas no exemplo anterior;
+
+```{r}
+# Imprime as 35 primeiras linhas
+head(hsb2f, n = 35)  
+```
+
+Já o comando *str* nos demonstra a leitura do arquivo, mas de forma compactada, ou seja, efetuando a leitura dos dados iniciais, e nos retornando como uma única linha,
+
+```{r}
+# Verificar a estrutura dos dados
+str(hsb2f)
+```
+
+3.2 Limpeza dos Dados Em seguida, vamos verificar e tratar valores ausentes, checar inconsistências e tipos de dados.
+
+3.2.1 Validação de valores ausentes Podemos definir valores ausaentes, valores que não possuem valores em nossa amostra de dados, imaginando um data.frame 2x5, conforme demonstrado abaixo:
+
+``` r
+data.frame(
+  id = c(1, 2, 3, 4, NA),
+  score = c(90, 85, NA, 92, 95)
+)
+```
+
+É possível analisar que NA seriam valores nulos, em um arquivo CSV, ODS ou XLS poderiam ser simplesmente células em branco, ou sem valores.
+
+Desta forma, utilizaremos a entrada *sum* que contará a quantidade de valores nulos em nossa amostra. Este valores são identificados através da função *is.na*, que retornará TRUE para cada "célula" nula identificada.
+
+```{r}
+# Verificar valores ausentes
+sum(is.na(hsb2f))
+```
+
+Caso necessário podemos utilizar o comando *na.omit* para a remoção de linhas com valores nulos
+
+```{r}
+# Tratar valores ausentes (exemplo: remover linhas com NA)
+hsb2f <- na.omit(hsb2f)
+```
+
+Por fim, o comando *summary* que por padrão sumariza todas as "colunas" existentes em nossa amostra, facilitando a validação dos dados existentes em nossa amostra e a identificação dos dados inconsistentes. Podemos dizer que dados inconsistentes são dados que não são reconhecidos pelo compilador R, por possuirem caracatres especiais.
+
+```{r}
+# Checar inconsistências e tipos de dados
+summary(hsb2f)
+```
+
+3.3 Análise Descritiva Agora, vamos realizar uma análise descritiva detalhada para nos familiarizarmos com os dados, organizá-los e sintetizá-los.
+
+Utilizando o comando *table* podemos contar as amostras separadas pelas variações existentes nos dados.
+
+```{r}
+# Contagem de frequências para a variável genero
+table(hsb2f$genero) 
+```
+
+O comando *hist* no possibilita efetuar a leitura dos dados númericos existentes para uma "coluna" de nossa amostra. A seguir é demonstrada a leitura da frequência dos dados referentes a pontuação de leitura de nossos dados.
+
+```{r}
+# Visualização da distribuição das variáveis
+hist(hsb2f$ler, main="Distribuição da Pontuação de Leitura", xlab="Pontuação de Leitura", ylab="Frequência")
+```
+
+3.4 Análise de Correlação Por fim, vamos realizar uma análise de correlação entre as variáveis do dataset.
+
+Uma matriz de correlação é uma tabela que mostra os coeficientes de correlação entre várias variáveis. Cada célula na matriz mostra a correlação entre duas variáveis. A correlação é uma medida estatística que indica a extensão em que duas variáveis estão linearmente relacionadas. Os valores de correlação variam de -1 a 1:
+
+-   **1** indica uma correlação positiva perfeita.
+
+-   **-1** indica uma correlação negativa perfeita.
+
+-   **0** indica que não há correlação linear entre as variáveis.
+
+O comando `cor(hsb2f[, sapply(hsb2f, is.numeric)])` calcula a matriz de correlação para todas as variáveis numéricas no dataset `hsb2f`. Aqui está um exemplo de como você pode calcular e visualizar a matriz de correlação:
+
+```{r}
+# Calcular a matriz de correlação
+cor_matrix <- cor(hsb2f[, sapply(hsb2f, is.numeric)])
+
+# Visualizar a matriz de correlação
+print(cor_matrix)
+```
+
+Se você quiser visualizar a matriz de correlação de uma maneira mais gráfica, você pode usar a função `corrplot` do pacote `corrplot`:
+
+```{r}
+
+# Visualizar a matriz de correlação graficamente
+corrplot(cor_matrix, method="circle")
+```
